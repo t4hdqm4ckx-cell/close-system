@@ -1,0 +1,44 @@
+# Entity map for Lumina Streaming Co.
+# Override per client.
+
+entities:
+  - code: LuminaUS
+    name: Lumina Streaming USA, Inc.
+    parent: null
+    functional_currency: USD
+    reporting_currency: USD
+    region: Americas
+    is_parent: true
+
+  - code: LuminaEMEA
+    name: Lumina Streaming EMEA Ltd.
+    parent: LuminaUS
+    functional_currency: EUR
+    reporting_currency: USD
+    region: EMEA
+    is_parent: false
+
+  - code: LuminaAPAC
+    name: Lumina Streaming APAC Pte. Ltd.
+    parent: LuminaUS
+    functional_currency: SGD
+    reporting_currency: USD
+    region: APAC
+    is_parent: false
+
+# Intercompany account pairs — receivable / payable mirror
+intercompany_pairs:
+  - receivable_entity: LuminaUS
+    receivable_account: '130100'
+    payable_entity: LuminaEMEA
+    payable_account: '230100'
+
+  - receivable_entity: LuminaUS
+    receivable_account: '130200'
+    payable_entity: LuminaAPAC
+    payable_account: '230200'
+
+  - receivable_entity: LuminaEMEA
+    receivable_account: '130100'
+    payable_entity: LuminaAPAC
+    payable_account: '230100'

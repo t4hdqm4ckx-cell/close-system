@@ -1,0 +1,39 @@
+# Materiality thresholds for the close system
+# Calibrated to Lumina Streaming Co. (FY2026, ~$1.8B annual revenue)
+# Override per client. All amounts in USD.
+
+client: lumina-streaming
+fiscal_year: 2026
+
+performance_materiality_usd: 9000000      # ~50bps of annual revenue
+trivial_threshold_usd: 450000              # 5% of performance materiality
+
+# P&L flux: BOTH thresholds must be exceeded to trigger commentary
+pl_flux:
+  mom:
+    amount_threshold_usd: 250000
+    pct_threshold: 0.05
+  bva:
+    amount_threshold_usd: 500000
+    pct_threshold: 0.05
+
+# Balance sheet reconciliation exception: ANY of these triggers exception
+bs_rec_exception:
+  amount_threshold_usd: 100000
+  age_threshold_days: 30
+  auto_investigate_amount_usd: 250000
+
+# Journal entry review: ANY of these triggers enhanced review
+je_review:
+  amount_threshold_usd: 250000
+  round_number_threshold_usd: 100000   # round at or above this is flagged
+  weekend_posting_review: true
+  holiday_posting_review: true
+  missing_support_review: true
+
+# Classification taxonomy used in outputs
+classifications:
+  - escalate    # exceeds performance materiality or has SOX implications
+  - investigate # exceeds trigger, below performance materiality
+  - note        # below trigger but worth flagging in workpaper
+  - trivial     # below trivial threshold, excluded from reporting

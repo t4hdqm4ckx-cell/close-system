@@ -1,0 +1,31 @@
+# Client data — never committed
+/data/client/*
+!/data/client/.gitkeep
+
+# Build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python virtualenvs
+.venv/
+venv/
+env/
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Sensitive
+.env
+.envrc
+
+# Temporary close artifacts (final outputs in close-cycles/ ARE committed for audit trail)
+*.tmp
+*.lock
+~$*

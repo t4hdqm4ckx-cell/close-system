@@ -1,0 +1,58 @@
+# Close calendar for the standard 5-business-day close
+# BD1 = first business day after period end
+
+close_target_business_days: 5
+
+phases:
+  - bd: 1
+    name: Cutoff and sub-ledger feeds
+    tasks:
+      - period_cutoff_confirmation
+      - subledger_feeds_loaded
+      - bank_statement_received
+
+  - bd: 2
+    name: Balance sheet recs
+    tasks:
+      - bank_reconciliation
+      - intercompany_matching
+      - accrual_review
+      - ar_ap_tieout
+    primary_agent: reconciliation
+
+  - bd: 3
+    name: Amortization and JE review
+    tasks:
+      - prepaid_amortization
+      - content_amortization
+      - je_review_pass_1
+    primary_agents: [reconciliation, je-reviewer]
+
+  - bd: 4
+    name: Flux and adjustments
+    tasks:
+      - pl_flux_analysis
+      - bs_flux_review
+      - tb_review
+      - adjusting_entries
+    primary_agent: flux-variance
+
+  - bd: 5
+    name: Final TB and reporting
+    tasks:
+      - final_tb_locked
+      - close_package_assembled
+      - cfo_signoff
+      - reporting_submission
+    primary_agent: close-reporting
+
+# Agent invocation sequence owned by Close Orchestrator
+orchestration:
+  - bd: 2
+    invoke: reconciliation
+  - bd: 3
+    invoke: [reconciliation, je-reviewer]
+  - bd: 4
+    invoke: flux-variance
+  - bd: 5
+    invoke: close-reporting
