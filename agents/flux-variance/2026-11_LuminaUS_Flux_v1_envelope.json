@@ -1,0 +1,196 @@
+{
+  "result": {
+    "period": "2026-11",
+    "entity": "LuminaUS",
+    "run_date": "2026-12-04",
+    "close_day": "BD4",
+    "accounts_reviewed": 25,
+    "accounts_flagged_mom": 7,
+    "accounts_flagged_bva": 3,
+    "accounts_flagged_both": 3,
+    "accounts_unexplained": 1,
+    "anomaly_flags_raised": 2,
+    "status": "FIRST_PASS_PENDING_REVIEW",
+    "blocking_items": 5,
+    "flux_file_path": "/close-cycles/2026-11/04-flux-analysis/2026-11_LuminaUS_Flux_v1.xlsx",
+    "commentary_path": "/close-cycles/2026-11/04-flux-analysis/2026-11_LuminaUS_Flux_v1_commentary.md"
+  },
+  "exceptions": [
+    {
+      "severity": "high",
+      "category": "bva_variance",
+      "account": "600100",
+      "account_name": "Marketing - Performance",
+      "entity": "LuminaUS",
+      "bva_amount_usd": 3000000,
+      "bva_pct": 0.20,
+      "mom_amount_usd": 3500000,
+      "mom_pct": 0.241,
+      "favorable": false,
+      "description": "Performance Marketing $3.0M unfavorable to budget (-20%). Driver: Q4 subscriber acquisition campaign pulled forward ~2 weeks (MKT-2026-11-031). Two open items: JE-0042 Saturday reclass ($1.5M) under JE Reviewer scope; stale Oct accrual $850K (JE-PROP-005) pending Controller approval.",
+      "proposed_action": "FP&A Manager to confirm JE-0042 resolution and JE-PROP-005 approval before finalizing commentary. If both resolved as proposed, final BvA variance = approximately $2.15M (-14%).",
+      "commentary_draft_available": true,
+      "commentary_final": false
+    },
+    {
+      "severity": "high",
+      "category": "bva_variance",
+      "account": "500200",
+      "account_name": "Streaming Delivery (CDN)",
+      "entity": "LuminaUS",
+      "bva_amount_usd": 800000,
+      "bva_pct": 0.098,
+      "mom_amount_usd": 600000,
+      "mom_pct": 0.071,
+      "favorable": false,
+      "description": "CDN $0.8M unfavorable to budget (-9.8%). Driven by November traffic accrual (JE-0041, INFRA-2026-11-007). Directionally correlated with campaign-driven streaming volume. Unit-rate vs. volume attribution pending.",
+      "proposed_action": "FP&A to obtain CDN volume/rate bridge from Infrastructure before close package. Commentary drafted as directional; requires confirmation.",
+      "commentary_draft_available": true,
+      "commentary_final": false
+    },
+    {
+      "severity": "high",
+      "category": "bva_variance",
+      "account": "400200",
+      "account_name": "Advertising Revenue - APAC",
+      "entity": "LuminaAPAC",
+      "bva_amount_usd": -700000,
+      "bva_pct": -0.175,
+      "mom_amount_usd": 300000,
+      "mom_pct": 0.10,
+      "favorable": false,
+      "description": "APAC Advertising Revenue $700K below budget (-17.5%). Driver not attributed. Possible deal slippage to December. Flagged as unexplained.",
+      "proposed_action": "FP&A to obtain revenue bridge from APAC commercial team. Required before close package assembly. Anomaly flag AF-002 raised.",
+      "commentary_draft_available": true,
+      "commentary_final": false
+    },
+    {
+      "severity": "medium",
+      "category": "mom_variance",
+      "account": "400200",
+      "account_name": "Advertising Revenue - US",
+      "entity": "LuminaUS",
+      "bva_amount_usd": 1500000,
+      "bva_pct": 0.048,
+      "mom_amount_usd": 4300000,
+      "mom_pct": 0.152,
+      "favorable": true,
+      "description": "US Advertising Revenue $4.3M favorable MoM (+15.2%). BvA variance of $1.5M does not clear 5% BvA percentage threshold (4.8%) — MoM flag only. Strong Q4 advertiser activity.",
+      "proposed_action": "No action required. Favorable trend noted for CFO package.",
+      "commentary_draft_available": true,
+      "commentary_final": false
+    },
+    {
+      "severity": "low",
+      "category": "mom_variance",
+      "account": "600300",
+      "account_name": "Sales Commissions",
+      "entity": "LuminaUS",
+      "bva_amount_usd": -100000,
+      "bva_pct": -0.029,
+      "mom_amount_usd": 300000,
+      "mom_pct": 0.094,
+      "favorable": false,
+      "description": "Sales Commissions $300K above prior month (+9.4%), correlated with higher advertising revenue. BvA variance $100K below threshold. MoM flag only.",
+      "proposed_action": "No action required.",
+      "commentary_draft_available": true,
+      "commentary_final": false
+    },
+    {
+      "severity": "low",
+      "category": "mom_variance",
+      "account": "700300",
+      "account_name": "FX Gain/Loss",
+      "entity": "LuminaUS",
+      "bva_amount_usd": 450000,
+      "bva_pct": null,
+      "mom_amount_usd": 650000,
+      "mom_pct": null,
+      "favorable": true,
+      "description": "FX swung $650K favorable MoM from ($200K) loss to $450K gain. Driven by IC balance revaluation (JE-0046, FX-2026-11-001). No budget established; BvA N/A.",
+      "proposed_action": "No action required. Note for CFO reporting.",
+      "commentary_draft_available": true,
+      "commentary_final": false
+    }
+  ],
+  "anomaly_flags": [
+    {
+      "id": "AF-001",
+      "severity": "high",
+      "account": "210400",
+      "account_name": "Accrued Marketing",
+      "description": "Accrued Marketing balance up $6.6M MoM (+80.5%) to $14.8M. Stale Oct-26 accrual ACR-2026-10-12 ($850K) not reversed, creating double-count risk on Marketing - Performance. Pending JE-PROP-005 approval.",
+      "source": "Reconciliation Agent EX-005 cross-reference + AccrualSchedule",
+      "resolution_required": true
+    },
+    {
+      "id": "AF-002",
+      "severity": "medium",
+      "account": "400200",
+      "account_name": "Advertising Revenue - APAC",
+      "description": "APAC Advertising Revenue $700K below budget with no attribution. Flagged as unexplained.",
+      "source": "BvA triage",
+      "resolution_required": true
+    }
+  ],
+  "open_items": [
+    {
+      "id": "OI-001",
+      "description": "Confirm resolution of JE-0042 (Saturday reclass $1.5M) with JE Reviewer",
+      "owner": "JE Reviewer → FP&A Manager",
+      "blocking": true,
+      "affects": ["600100 commentary"]
+    },
+    {
+      "id": "OI-002",
+      "description": "Controller approval of JE-PROP-005 (stale $850K accrual reversal)",
+      "owner": "Controller",
+      "blocking": true,
+      "affects": ["600100 variance amount", "210400 balance"]
+    },
+    {
+      "id": "OI-003",
+      "description": "APAC revenue bridge for $700K advertising shortfall",
+      "owner": "APAC commercial team via FP&A",
+      "blocking": true,
+      "affects": ["400200 APAC commentary", "AF-002 resolution"]
+    },
+    {
+      "id": "OI-004",
+      "description": "CDN volume/rate bridge from Infrastructure",
+      "owner": "Engineering/Infrastructure",
+      "blocking": false,
+      "affects": ["500200 commentary precision"]
+    },
+    {
+      "id": "OI-005",
+      "description": "Verify Accrued Marketing ending balance ties to accrual schedule post JE-PROP-005",
+      "owner": "FP&A / Controller",
+      "blocking": true,
+      "affects": ["AF-001 resolution", "210400 balance sheet sign-off"]
+    }
+  ],
+  "_metadata": {
+    "agent": "flux-variance",
+    "version": "0.1.0",
+    "run_timestamp": "2026-12-04T00:00:00Z",
+    "period": "2026-11",
+    "entities_covered": ["LuminaUS", "LuminaAPAC (revenue only)", "LuminaEMEA (revenue only)"],
+    "skills_loaded": ["flux-analysis", "bva-variance-analysis", "materiality-thresholds", "finance-conventions", "xlsx"],
+    "sources": [
+      {
+        "path": "https://docs.google.com/spreadsheets/d/1Kcvdee_bziqKYR81CTfKqou7GOU5hG20ESxA_HEcKLA",
+        "sheet": "TrialBalance"
+      },
+      {
+        "path": "/close-cycles/2026-11/02-reconciliations/2026-11_LuminaUS_Recon_v1_memo.md",
+        "note": "Referenced for EX-004 (IC mismatch) and EX-005 (stale accrual)"
+      }
+    ],
+    "human_reviewer": null,
+    "reviewer_decision": null,
+    "reviewer_date": null,
+    "je_dependency": "JE-2026-11-0042 must be resolved by JE Reviewer before commentary is final",
+    "rec_dependency": "JE-PROP-005 must be approved by Controller before Marketing variance is final"
+  }
+}
