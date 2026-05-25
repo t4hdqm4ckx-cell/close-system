@@ -1,39 +1,212 @@
-# Materiality thresholds for the close system
-# Calibrated to Lumina Streaming Co. (FY2026, ~$1.8B annual revenue)
-# Override per client. All amounts in USD.
+# =============================================================================
+# materiality.yaml — Close System Materiality Thresholds
+# =============================================================================
+#
+# PURPOSE
+# -------
+# This file is the single source of truth for all materiality thresholds used
+# across the five close agents. Every agent loads this file at runtime. Changing
+# a value here changes it everywhere — no agent-level overrides needed.
+#
+# HOW TO CALIBRATE FOR A NEW CLIENT
+# ----------------------------------
+# 1. Set `annual_revenue_usd` to the client's most recent full-year revenue.
+# 2. Performance materiality is typically 40–60bps of revenue for a public company
+#    and 75–100bps for a private company. Start at 50bps and adjust up if the
+#    audit committee has a lower threshold on file.
+# 3. Trivial threshold is always 5% of performance materiality. Do not change
+#    this ratio without explicit Controller sign-off.
+# 4. P&L flux triggers: use 5% / $250K MoM and 5% / $500K BvA as defaults.
+#    For smaller companies (< $100M revenue), lower the dollar amounts to
+#    $50K MoM and $100K BvA. For larger companies (> $5B revenue), raise
+#    them proportionally.
+# 5. BS rec exception: $100K / 30 days are standard. For companies with high
+#    transaction volume (e.g., consumer fintech), tighten to $25K / 15 days.
+# 6. JE review: $250K trigger is standard. For SOX-accelerated filers, lower
+#    to $100K. For non-SOX private companies, $500K may be appropriate.
+#
+# VERSION CONTROL
+# ---------------
+# Commit every change to this file with a descriptive message. The close
+# system's audit trail references the git SHA of this file at the time each
+# close was run, so changes are traceable.
+#
+# =============================================================================
 
-client: lumina-streaming
-fiscal_year: 2026
+# -----------------------------------------------------------------------------
+# CLIENT METADATA
+# -----------------------------------------------------------------------------
 
-performance_materiality_usd: 9000000      # ~50bps of annual revenue
-trivial_threshold_usd: 450000              # 5% of performance materiality
+client:
+  name: Lumina Streaming Co.
+  code: lumina-streaming                # used in file naming and envelope metadata
+  fiscal_year: 2026
+  fiscal_year_end: "12-31"              # MM-DD
+  reporting_currency: USD
+  accounting_standard: US_GAAP          # US_GAAP | IFRS
+  sox_filer: false                      # true = accelerated filer, stricter JE thresholds
+  close_target_business_days: 5
 
-# P&L flux: BOTH thresholds must be exceeded to trigger commentary
+# -----------------------------------------------------------------------------
+# REVENUE BASE (used to derive and validate thresholds)
+# -----------------------------------------------------------------------------
+
+revenue:
+  annual_usd: 1800000000                # ~$1.8B — update each fiscal year
+  monthly_run_rate_usd: 150000000       # annual / 12 — used for MoM context
+  # Threshold derivation notes (for reference, not used by agents directly):
+  #   performance_materiality = annual_revenue * 0.005   → $9.0M
+  #   trivial_threshold        = performance_materiality * 0.05 → $450K
+
+# -----------------------------------------------------------------------------
+# TOP-LEVEL THRESHOLDS
+# -----------------------------------------------------------------------------
+
+performance_materiality_usd: 9000000
+# ~50bps of annual revenue. Any single misstatement above this amount is
+# presumed material to the financial statements. Used for audit-level scope
+# and SOX testing. Agents escalate (not just investigate) items at this level.
+
+trivial_threshold_usd: 450000
+# 5% of performance materiality. Items below this are excluded from executive
+# reporting but still appear in workpapers. Do not change this ratio.
+
+# -----------------------------------------------------------------------------
+# INCOME STATEMENT — P&L FLUX TRIGGERS
+# -----------------------------------------------------------------------------
+# An account requires commentary when BOTH the amount AND the percentage
+# threshold are exceeded. Meeting only one condition is not sufficient.
+
 pl_flux:
-  mom:
-    amount_threshold_usd: 250000
-    pct_threshold: 0.05
-  bva:
-    amount_threshold_usd: 500000
-    pct_threshold: 0.05
 
-# Balance sheet reconciliation exception: ANY of these triggers exception
+  mom:                                  # month-over-month
+    amount_threshold_usd: 250000        # absolute change must exceed this
+    pct_threshold: 0.05                 # AND percentage change must exceed 5%
+    comment: >
+      Both conditions must be true. A $1M variance on a $500M account (0.2%)
+      is not interesting. A 30% swing on a $50K account is not interesting.
+
+  bva:                                  # budget vs. actual
+    amount_threshold_usd: 500000        # absolute variance must exceed this
+    pct_threshold: 0.05                 # AND percentage variance must exceed 5%
+    comment: >
+      Use the budget column from the trial balance. If no budget exists for
+      an account, skip BvA and note "no budget established" in the flux file.
+
+  # Account-specific overrides — use when a particular account warrants
+  # tighter or looser scrutiny than the defaults above.
+  account_overrides:
+    "400100":                           # Subscription Revenue
+      bva_amount_threshold_usd: 1000000 # higher bar — large stable account
+      bva_pct_threshold: 0.03           # tighter % — revenue is closely tracked
+    "600100":                           # Marketing - Performance
+      bva_amount_threshold_usd: 250000  # lower bar — volatile, high-scrutiny account
+      bva_pct_threshold: 0.05
+
+# -----------------------------------------------------------------------------
+# BALANCE SHEET — RECONCILIATION EXCEPTION THRESHOLDS
+# -----------------------------------------------------------------------------
+# An item on a BS reconciliation is an exception when ANY of these is true.
+
 bs_rec_exception:
-  amount_threshold_usd: 100000
-  age_threshold_days: 30
-  auto_investigate_amount_usd: 250000
+  amount_threshold_usd: 100000          # unreconciled item exceeds this
+  age_threshold_days: 30                # OR item is older than this (regardless of amount)
+  auto_investigate_amount_usd: 250000   # OR item exceeds this (regardless of age)
 
-# Journal entry review: ANY of these triggers enhanced review
+  # Rec-type-specific overrides
+  rec_type_overrides:
+    bank:
+      outstanding_check_flag_days: 60   # checks older than 60 days are flagged
+      outstanding_deposit_flag_days: 5  # deposits older than 5 days are flagged
+    intercompany:
+      mismatch_threshold_usd: 100000    # IC mismatch above this is an exception
+      stale_balance_days: 60            # no movement in 60 days = stale flag
+    accrual:
+      stale_reversal_days: 45           # accrual not reversed after 45 days = flag
+      prior_period_carry_flag: true     # any prior-period accrual still open = flag
+
+# -----------------------------------------------------------------------------
+# JOURNAL ENTRY — REVIEW TRIGGERS
+# -----------------------------------------------------------------------------
+# A journal entry is flagged for enhanced review when ANY of these is true.
+
 je_review:
-  amount_threshold_usd: 250000
-  round_number_threshold_usd: 100000   # round at or above this is flagged
-  weekend_posting_review: true
-  holiday_posting_review: true
-  missing_support_review: true
+  amount_threshold_usd: 250000          # entries at or above this get enhanced review
+  round_number_threshold_usd: 100000    # round amounts at or above this are flagged
+  weekend_posting_review: true          # Saturday or Sunday post dates are flagged
+  holiday_posting_review: true          # public holiday post dates are flagged
+  missing_support_review: true          # missing support doc reference = automatic flag
+  unauthorized_user_review: true        # poster not on standard close team = flag
+  duplicate_reference_review: true      # same support doc ref on multiple JEs = flag
 
-# Classification taxonomy used in outputs
+  # JE approval tiers — determines who must approve before posting
+  approval_tiers:
+    - max_amount_usd: 25000
+      approver: preparer_self           # preparer can self-certify
+    - max_amount_usd: 250000
+      approver: senior_accountant       # requires senior accountant sign-off
+    - max_amount_usd: 1000000
+      approver: assistant_controller    # requires assistant controller sign-off
+    - max_amount_usd: 9000000
+      approver: controller              # requires controller sign-off
+    - max_amount_usd: null              # null = no upper limit
+      approver: cfo                     # above performance materiality = CFO sign-off
+
+# -----------------------------------------------------------------------------
+# CLASSIFICATION TAXONOMY
+# -----------------------------------------------------------------------------
+# Every exception produced by any agent is tagged with one of these values.
+# The Close Orchestrator uses this to route exceptions to the right owner.
+
 classifications:
-  - escalate    # exceeds performance materiality or has SOX implications
-  - investigate # exceeds trigger, below performance materiality
-  - note        # below trigger but worth flagging in workpaper
-  - trivial     # below trivial threshold, excluded from reporting
+  escalate:
+    description: >
+      Exceeds performance materiality ($9M) or has SOX / audit committee
+      implications. Routes to CFO and Controller. Close-blocking.
+    threshold_usd: 9000000
+
+  investigate:
+    description: >
+      Exceeds the relevant trigger threshold and is below performance
+      materiality. Routes to the account owner. Close-blocking until resolved
+      or explicitly accepted by the Controller with documented rationale.
+
+  note:
+    description: >
+      Below the trigger threshold but worth flagging. Appears in workpapers
+      and the detailed exception list. Does not appear in the executive memo.
+      Not close-blocking.
+
+  trivial:
+    description: >
+      Below the trivial threshold ($450K). Excluded from all reporting.
+      Recorded in the workpaper audit trail only.
+    threshold_usd: 450000
+
+# -----------------------------------------------------------------------------
+# ENTITY-SPECIFIC OVERRIDES
+# -----------------------------------------------------------------------------
+# Use when a subsidiary operates in a smaller market and warrants proportionally
+# lower thresholds, or when local regulations require stricter controls.
+
+entity_overrides:
+  LuminaEMEA:
+    pl_flux_mom_amount_threshold_usd: 100000  # smaller entity, lower absolute bar
+    pl_flux_mom_pct_threshold: 0.05           # same % threshold
+    bs_rec_exception_amount_usd: 50000        # tighter on BS given FX complexity
+  LuminaAPAC:
+    pl_flux_mom_amount_threshold_usd: 75000
+    pl_flux_mom_pct_threshold: 0.05
+    bs_rec_exception_amount_usd: 50000
+
+# -----------------------------------------------------------------------------
+# AUDIT AND SOX THRESHOLDS (separate from close thresholds)
+# -----------------------------------------------------------------------------
+# These are not used by close agents directly but are referenced when the
+# JE Reviewer escalates items with potential SOX implications.
+
+audit:
+  planning_materiality_usd: 18000000    # typically 1–2x performance materiality
+  clearly_trivial_usd: 450000           # same as trivial_threshold above
+  sox_significant_account_threshold_usd: 9000000   # accounts above this in scope
+  sox_je_testing_threshold_usd: 100000  # JEs above this may be in SOX test scope
